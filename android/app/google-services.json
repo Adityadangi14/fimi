@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "570567633553",
+    "project_id": "fimi-26996",
+    "storage_bucket": "fimi-26996.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:570567633553:android:a74cdffffc3690b7816d30",
+        "android_client_info": {
+          "package_name": "com.example.fimi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "570567633553-assinbssdfge9u5st2njqmburefdnpkm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fimi",
+            "certificate_hash": "ac9f8e77a23b9e5b703e5554663815b03df155ae"
+          }
+        },
+        {
+          "client_id": "570567633553-1kkkvoqpmdg7l8iirq0o27jpd80uc07g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW1e5d8jhzuCYBokV9WsnKzgSI6DEp2og"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "570567633553-1kkkvoqpmdg7l8iirq0o27jpd80uc07g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
