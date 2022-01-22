@@ -157,7 +157,9 @@ class Signaling{
         }
       });
      });
-
+     peerConnection!.onIceConnectionState = (e) {
+      print('connectionState:'+ e.toString());
+    };
   }
 
   Future<void> openUserMedia(
