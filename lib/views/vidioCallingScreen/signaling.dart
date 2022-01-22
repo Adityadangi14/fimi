@@ -44,6 +44,10 @@ class Signaling{
      peerConnection = await createPeerConnection(configuration,offerSdpConstraints);
     registerPeerConnectionListeners();
 
+         peerConnection!.onIceConnectionState = (e) {
+      print('connectionState:'+ e.toString());
+    };
+
     localStream?.getTracks().forEach((track) {
       peerConnection?.addTrack(track);
     });
@@ -93,14 +97,12 @@ class Signaling{
       });
      });
 
-     peerConnection!.onIceConnectionState = (e) {
-      print('connectionState:'+ e.toString());
-    };
+
     
   }
 
   joinRoom( String roomId) async{
-      print('data+++++++joinRoom2'+ roomId.toString());
+      
 
       peerConnection = await createPeerConnection(configuration);
 
@@ -115,22 +117,25 @@ class Signaling{
       DocumentSnapshot snapshot = await databaseServices.getSdpDoc(roomId);
       print("roomRef "+ snapshot.toString());
       var data = await snapshot.data() as Map<String ,dynamic>;
-      print("roomRef"+ data.toString());
+      
       // var data = roomSnapshot.data() as Map<String ,dynamic>;
-      print('data+++++++joinRoomxy' + data.toString());
+     
 
       peerConnection?.onIceCandidate = (RTCIceCandidate candidate){
-        print('onIceCandidate : ' + candidate.toString());
+        
           databaseServices.
           setCalleeCandidate(roomId, candidate.toMap());
       };
 
       registerPeerConnectionListeners();
+       peerConnection!.onIceConnectionState = (e) {
+      print('connectionState:'+ e.toString());
+    };
 
-      print('data+++++++joinRoomxx' );
+      
       var offer = data['offer'];
 
-      print('offer : '+offer['sdp']);
+     
 
       await peerConnection?.setRemoteDescription(
         RTCSessionDescription(offer['sdp'], offer['type']));
@@ -138,7 +143,7 @@ class Signaling{
       
       var answer = await peerConnection!.createAnswer();
 
-       print('answer : '+answer.toString());
+       
 
       await peerConnection!.setLocalDescription(answer!);
 
@@ -157,9 +162,7 @@ class Signaling{
         }
       });
      });
-     peerConnection!.onIceConnectionState = (e) {
-      print('connectionState:'+ e.toString());
-    };
+    
   }
 
   Future<void> openUserMedia(
