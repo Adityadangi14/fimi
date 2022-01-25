@@ -176,53 +176,56 @@ class _RoomTilesState extends State<RoomTiles> {
           if (snapshot.connectionState == ConnectionState.done) {
             print('+++++++++' + snapshot.data.toString());
             return Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(snapshot.data[0].toString(), scale: 1),
-                      ),
-                      SizedBox(
-                        width: 25,
-                      ),
-                      Text(
-                        widget.roomId
-                            .toString()
-                            .replaceAll(snapshot.data[1], '')
-                            .replaceAll('_', ''),
-                        style: GoogleFonts.raleway(fontSize: 20),
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>VideoCallJoinScreen(widget.roomId)));
-                        },
-                        child: Icon(
-                          Icons.add_ic_call,
-                          size: 30,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage:
+                              NetworkImage(snapshot.data[0].toString(), scale: 1),
                         ),
-                      ),
-                      SizedBox(
-                        width: 25,
-                      ),
-                      InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        VideoCallScreen(widget.roomId)));
+                        SizedBox(
+                          width: 25,
+                        ),
+                        Text(
+                          widget.roomId
+                              .toString()
+                              .replaceAll(snapshot.data[1], '')
+                              .replaceAll('_', ''),
+                          style: GoogleFonts.raleway(fontSize: 20),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>VideoCallJoinScreen(widget.roomId)));
                           },
-                          child: Icon(Icons.video_call, size: 30)),
-                    ],
-                  )
-                ],
+                          child: Icon(
+                            Icons.add_ic_call,
+                            size: 30,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 25,
+                        ),
+                        InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          VideoCallScreen(widget.roomId)));
+                            },
+                            child: Icon(Icons.video_call, size: 30)),
+                      ],
+                    )
+                  ],
+                ),
               ),
             );
           } else {

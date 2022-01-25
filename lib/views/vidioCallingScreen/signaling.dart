@@ -1,4 +1,3 @@
-
 //step 1: collecting our local ice candidates
 //step 2: send it to our room
 //step 3: listen to remote session descrption
@@ -151,8 +150,13 @@ class Signaling{
 
     callerCandidateCollectionRef.snapshots().listen((snapshot) {
       snapshot.docChanges.forEach((change) {
+
+        print("inside listen");
         if(change.type == DocumentChangeType.added){
+          print("inside listen2");
         Map<String, dynamic> data = change.doc.data() as Map<String, dynamic>;
+
+        print('data+++++++'+data['candidate'].toString());
 
           peerConnection?.addCandidate(RTCIceCandidate(
             data['candidate'],
