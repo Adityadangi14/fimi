@@ -204,6 +204,7 @@ class _RoomTilesState extends State<RoomTiles> {
                         InkWell(
                           onTap: (){
                             Navigator.push(context, MaterialPageRoute(builder: (context)=>VideoCallJoinScreen(widget.roomId)));
+                            
                           },
                           child: Icon(
                             Icons.add_ic_call,
@@ -220,6 +221,7 @@ class _RoomTilesState extends State<RoomTiles> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           VideoCallScreen(widget.roomId)));
+                                          
                             },
                             child: Icon(Icons.video_call, size: 30)),
                       ],

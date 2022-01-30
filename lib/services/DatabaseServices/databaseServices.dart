@@ -62,11 +62,12 @@ class DatabaseServices {
 
   getSdpRoomRef(String roomId) async {
     return await FirebaseFirestore.instance.collection('rooms')
-    .doc(roomId).collection('sdp');
+    .doc(roomId).collection('sdp').doc('OfferAnswerSdp');
   } 
 
   newCalleeCandidateCheck(String roomId) async {
-    return await FirebaseFirestore.instance.collection('rooms').doc(roomId).collection('calleeCandidate');
+    return await FirebaseFirestore.instance.collection('rooms')
+    .doc(roomId).collection('calleeCandidate');
   }
 
 
@@ -93,6 +94,8 @@ class DatabaseServices {
     .doc(roomId)
     .collection('callerCandidates');
   }
+
+  
 
   setCaller(String roomId , String userName ){
     FirebaseFirestore.instance.collection('rooms')

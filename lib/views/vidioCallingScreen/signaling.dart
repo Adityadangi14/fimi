@@ -48,7 +48,10 @@ class Signaling{
     };
 
     localStream?.getTracks().forEach((track) {
+      print('track Added');
       peerConnection?.addTrack(track);
+      
+      
     });
 
      peerConnection?.onIceConnectionState = (e) {
@@ -69,24 +72,39 @@ class Signaling{
 
     databaseServices.addOfferOrAnswerSdp({"offer":offer.toMap()}, roomId!);   
 
-    CollectionReference sdpCollectionRef = databaseServices.getSdpRoomRef(roomId);
+    DocumentReference sdpCollectionRef = await  databaseServices.getSdpRoomRef(roomId);
 
-    sdpCollectionRef.snapshots().listen(( dynamic snapshot) async { 
+    sdpCollectionRef.snapshots().listen((snapshot) async { 
+     print('Got updated room: ${snapshot.data()}');
+
       Map<String ,dynamic> data = snapshot.data() as Map<String , dynamic>;
-      if(peerConnection?.getRemoteDescription() != null && data['answer'] != null ){
+      print('data------'+data['answer']['sdp']);
+      if(peerConnection!.getRemoteDescription() != null && data['answer'] != null ){
           var answer = RTCSessionDescription(data['answer']['sdp'], data['answer']['type']);
 
           await peerConnection?.setRemoteDescription(answer);
+
+          var answer2 = await peerConnection?.getRemoteDescription();
+
+          print("answer 2 : $answer2");
       }
     });
 
-    CollectionReference calleeCandidateCollectionRef = databaseServices.newCalleeCandidateCheck(roomId);
+    peerConnection?.onTrack = (RTCTrackEvent event) {
+        print('Got remote track: ${event.streams[0]}');
+        event.streams[0].getTracks().forEach((track) {
+          print('Add a track to the remoteStream: $track');
+          remoteStream?.addTrack(track);
+        });
+      };
+
+    CollectionReference calleeCandidateCollectionRef = await databaseServices.newCalleeCandidateCheck(roomId);
 
     calleeCandidateCollectionRef.snapshots().listen((snapshot) {
       snapshot.docChanges.forEach((change) {
         if(change.type == DocumentChangeType.added){
+          
         Map<String, dynamic> data = change.doc.data() as Map<String, dynamic>;
-
           peerConnection?.addCandidate(RTCIceCandidate(
             data['candidate'],
             data['sdpMid'],
@@ -108,6 +126,7 @@ class Signaling{
       registerPeerConnectionListeners();
 
     localStream?.getTracks().forEach((track) {
+      print('track added');
         peerConnection?.addTrack(track, localStream!);
       });
 
@@ -138,13 +157,23 @@ class Signaling{
 
       await peerConnection?.setRemoteDescription(
         RTCSessionDescription(offer['sdp'], offer['type']));
-      print('offer : '+offer['type']);
+     
       
       var answer = await peerConnection!.createAnswer();
 
-       
+       print('answer:' + answer.toString());
+
+       databaseServices.addOfferOrAnswerSdp({"answer":answer.toMap()}, roomId);
 
       await peerConnection!.setLocalDescription(answer!);
+
+      peerConnection?.onTrack = (RTCTrackEvent event) {
+        print('Got remote track: ${event.streams[0]}');
+        event.streams[0].getTracks().forEach((track) {
+          print('Add a track to the remoteStream: $track');
+          remoteStream?.addTrack(track);
+        });
+      };
 
     CollectionReference callerCandidateCollectionRef = databaseServices.newCallerCandidateCheck(roomId);
 
@@ -157,6 +186,8 @@ class Signaling{
         Map<String, dynamic> data = change.doc.data() as Map<String, dynamic>;
 
         print('data+++++++'+data['candidate'].toString());
+
+        
 
           peerConnection?.addCandidate(RTCIceCandidate(
             data['candidate'],
@@ -182,11 +213,20 @@ class Signaling{
     remoteVideo.srcObject = await createLocalMediaStream('key');
   }
 
-  void hangUp(roomId){
+  void hangUp(roomId, localVideo){
    databaseServices.deleteCaller(roomId);
    databaseServices.deleteCalleeCandidates(roomId);
    databaseServices.deleteCallerCandidates(roomId);
    databaseServices.deleteSdp(roomId);
+   List<MediaStreamTrack> tracks = localVideo.srcObject!.getTracks();
+    tracks.forEach((track) {
+      track.stop();
+    });
+
+    localStream!.dispose();
+    remoteStream?.dispose();
+
+   peerConnection!.close();
   }
 
   void registerPeerConnectionListeners() {
@@ -206,6 +246,7 @@ class Signaling{
       print('ICE connection state change: $state');
     };
 
+    
     peerConnection?.onAddStream = (MediaStream stream) {
       print("Add remote stream");
       onAddRemoteStream?.call(stream);

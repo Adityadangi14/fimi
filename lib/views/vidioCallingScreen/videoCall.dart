@@ -28,6 +28,8 @@ Signaling signaling = new Signaling();
     
     
     signaling.openUserMedia(_localRanderer, _remoteRanderer);
+
+    
     signaling.onAddRemoteStream =((stream){
       
       setState(() {
@@ -95,7 +97,7 @@ Signaling signaling = new Signaling();
             child:  InkWell(
               onTap: (){
                 
-                signaling.hangUp(widget.roomId);
+                signaling.hangUp(widget.roomId,_localRanderer);
                Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => HomePage()));
               },
