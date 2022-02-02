@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:fimi/services/DatabaseServices/databaseServices.dart';
 import 'package:fimi/sharedPreferences/sharePreferences.dart';
+import 'package:sdp_transform/sdp_transform.dart';
 
 
 typedef void StreamStateCallback(MediaStream stream);
@@ -31,6 +32,7 @@ class Signaling{
 
   createConnection(String? roomId) async{
     
+    
 
     final Map<String, dynamic> offerSdpConstraints = {
       "mandatory": {
@@ -50,8 +52,6 @@ class Signaling{
     localStream?.getTracks().forEach((track) {
       print('track Added');
       peerConnection?.addTrack(track);
-      
-      
     });
 
      peerConnection?.onIceConnectionState = (e) {
@@ -70,34 +70,39 @@ class Signaling{
 
     await peerConnection!.setLocalDescription(offer);
 
-    databaseServices.addOfferOrAnswerSdp({"offer":offer.toMap()}, roomId!);   
+    databaseServices.addOfferOrAnswerSdp({"offer":offer.toMap()}, roomId!); 
 
-    DocumentReference sdpCollectionRef = await  databaseServices.getSdpRoomRef(roomId);
 
-    sdpCollectionRef.snapshots().listen((snapshot) async { 
-     print('Got updated room: ${snapshot.data()}');
-
-      Map<String ,dynamic> data = snapshot.data() as Map<String , dynamic>;
-      print('data------'+data['answer']['sdp']);
-      if(peerConnection!.getRemoteDescription() != null && data['answer'] != null ){
-          var answer = RTCSessionDescription(data['answer']['sdp'], data['answer']['type']);
-
-          await peerConnection?.setRemoteDescription(answer);
-
-          var answer2 = await peerConnection?.getRemoteDescription();
-
-          print("answer 2 : $answer2");
-      }
-    });
-
-    peerConnection?.onTrack = (RTCTrackEvent event) {
+     peerConnection?.onTrack = (RTCTrackEvent event) {
         print('Got remote track: ${event.streams[0]}');
         event.streams[0].getTracks().forEach((track) {
           print('Add a track to the remoteStream: $track');
           remoteStream?.addTrack(track);
         });
-      };
+      };  
 
+    DocumentReference sdpCollectionRef = await  databaseServices.getSdpRoomRef(roomId);
+
+     
+
+    sdpCollectionRef.snapshots().listen((snapshot) async {
+      print('Got updated room: ${snapshot.data()}');
+
+      if(snapshot.data() != null){
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      if (peerConnection?.getRemoteDescription() != null &&
+          data['answer'] != null) {
+            String sdp = write(data['answer']['sdp'], null);
+        var answer = RTCSessionDescription(sdp, 'answer');
+        
+        print("Someone tried to connect");
+        print('yodata+++${peerConnection?.runtimeType}');
+        await peerConnection?.setRemoteDescription(answer);
+      }
+    }
+    });
+    
+    
     CollectionReference calleeCandidateCollectionRef = await databaseServices.newCalleeCandidateCheck(roomId);
 
     calleeCandidateCollectionRef.snapshots().listen((snapshot) {
@@ -226,7 +231,7 @@ class Signaling{
     localStream!.dispose();
     remoteStream?.dispose();
 
-   peerConnection!.close();
+   
   }
 
   void registerPeerConnectionListeners() {

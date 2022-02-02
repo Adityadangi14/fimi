@@ -373,6 +373,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.14.0+3"
+  sdp_transform:
+    dependency: "direct main"
+    description:
+      name: sdp_transform
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2"
   shared_preferences:
     dependency: "direct main"
     description:

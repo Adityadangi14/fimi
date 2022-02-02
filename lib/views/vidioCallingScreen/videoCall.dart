@@ -26,8 +26,10 @@ Signaling signaling = new Signaling();
     signaling.createConnection(widget.roomId);
     initRanderers();
     
+    setState(() {
+      signaling.openUserMedia(_localRanderer, _remoteRanderer);
+    });
     
-    signaling.openUserMedia(_localRanderer, _remoteRanderer);
 
     
     signaling.onAddRemoteStream =((stream){
